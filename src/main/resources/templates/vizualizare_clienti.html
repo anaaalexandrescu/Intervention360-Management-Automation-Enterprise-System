@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Management - INTERVENTION360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FDFBF7;
+            --accent: #B8A389;
+            --text: #4A443F;
+            --border: #E8E2D9;
+            --card-bg: #FFFFFF;
+            --card-shadow: rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode {
+            --bg: #121212;
+            --accent: #D4C3B0;
+            --text: #E0E0E0;
+            --card-bg: #1E1E1E;
+            --border: #333333;
+            --card-shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            padding: 40px;
+            transition: 0.3s;
+            color: var(--text);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .theme-toggle {
+            background: var(--accent);
+            color: #121212;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px var(--card-shadow);
+        }
+
+        th, td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(184, 163, 137, 0.1);
+            color: var(--accent);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .count-badge {
+            background: rgba(184, 163, 137, 0.15);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .btn-delete {
+            color: #ff5f5f;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-container">
+    <div>
+        <a href="/dashboard" class="btn-back">Back to Dashboard</a>
+        <h1 style="margin-top: 10px; font-weight: 800;">Customers and Activity</h1>
+    </div>
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">DARK</button>
+</div>
+
+<table class="client-table">
+    <thead>
+    <tr>
+        <th>Customer Name</th>
+        <th>Email Address</th>
+        <th>Total Jobs</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${clienti}">
+        <td style="font-weight: 600;" th:text="${c.nume} + ' ' + ${c.prenume}">Name</td>
+        <td th:text="${c.email}">Email</td>
+        <td><span class="count-badge" th:text="${c.nr_lucrari}">0</span></td>
+        <td>
+            <a th:href="@{/client/sterge/{id}(id=${c.client_id})}" class="btn-delete"
+               onclick="return confirm('Permanently delete this customer?')">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        btn.textContent = isDark ? 'LIGHT' : 'DARK';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeBtn').textContent = 'LIGHT';
+        }
+    };
+</script>
+</body>
+</html>

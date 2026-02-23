@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule New Intervention - INTERVENTION360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FDFBF7;
+            --accent: #B8A389;
+            --text-dark: #2D2A26;
+            --text-muted: #8C8379;
+            --border: #E8E2D9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(184, 163, 137, 0.08);
+        }
+
+        body.dark-mode {
+            --bg-main: #121212;
+            --accent: #D4C3B0;
+            --text-dark: #E0E0E0;
+            --text-muted: #a0a0a0;
+            --border: #333333;
+            --card-bg: #1E1E1E;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-dark);
+            padding: 40px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: var(--bg-main);
+            color: var(--text-dark);
+            font-family: inherit;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-submit {
+            background: var(--accent);
+            color: #121212;
+            padding: 16px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .theme-toggle {
+            background: var(--accent);
+            color: #121212;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-nav">
+        <a href="/dashboard" class="btn-back">← Back to Dashboard</a>
+        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">DARK</button>
+    </div>
+
+    <h1 style="margin-bottom: 30px; font-weight: 800;">Schedule New Intervention</h1>
+
+    <div class="form-card">
+        <form th:action="@{/adauga_interventie}" method="post">
+            <div class="form-group">
+                <label>Select Client</label>
+                <select name="clientId" required>
+                    <option value="">-- Choose a client --</option>
+                    <option th:each="c : ${clienti}"
+                            th:value="${c.id}"
+                            th:text="${c.nume} + ' ' + ${c.prenume} + ' (' + ${c.email} + ')'">Client</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Select Service</label>
+                <select name="serviciuId" required>
+                    <option value="">-- Choose a service --</option>
+                    <option th:each="s : ${servicii}"
+                            th:value="${s.id}"
+                            th:text="${s.denumire} + ' - ' + ${s.pretStandard} + ' RON'">Service</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Appointment Date & Time</label>
+                <input type="datetime-local" name="data" required>
+            </div>
+
+            <div class="form-group">
+                <label>Material (Optional)</label>
+                <select name="materialId">
+                    <option value="">-- No material --</option>
+                    <option th:each="m : ${materiale}"
+                            th:value="${m.id}"
+                            th:text="${m.denumire} + ' - ' + ${m.pretAchizitie} + ' RON/' + ${m.unitateMasura}">Material</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" name="cantitate" min="1" placeholder="Example: 5">
+            </div>
+
+            <button type="submit" class="btn-submit">Create Intervention</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        btn.textContent = isDark ? 'LIGHT' : 'DARK';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeBtn').textContent = 'LIGHT';
+        }
+    };
+</script>
+</body>
+</html>

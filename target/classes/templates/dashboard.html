@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Dashboard | INTERVENTION360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FDFBF7;
+            --bg-nav: #FFFFFF;
+            --accent: #B8A389;
+            --text-dark: #2D2A26;
+            --text-muted: #8C8379;
+            --border: #E8E2D9;
+            --shadow: 0 4px 20px rgba(184, 163, 137, 0.08);
+            --card-bg: #FFFFFF;
+            --column-bg: rgba(232, 226, 217, 0.3);
+        }
+
+        body.dark-mode {
+            --bg-main: #121212;
+            --bg-nav: #1E1E1E;
+            --card-bg: #1E1E1E;
+            --text-dark: #E0E0E0;
+            --text-muted: #a0a0a0;
+            --border: #333333;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --accent: #D4C3B0;
+            --column-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-dark);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .top-nav {
+            height: 70px;
+            background: var(--bg-nav);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            font-weight: 900;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 30px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(10.5px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-10.5px) rotate(-45deg);
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 70px;
+            left: -300px;
+            width: 300px;
+            height: calc(100vh - 70px);
+            background: var(--bg-nav);
+            border-right: 1px solid var(--border);
+            transition: 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .menu-section {
+            padding: 20px;
+        }
+
+        .menu-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            margin-bottom: 5px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(184, 163, 137, 0.1);
+            color: var(--accent);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 16px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: 0.85rem;
+            width: 180px;
+            outline: none;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-bar button {
+            background: var(--accent);
+            color: #121212;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .theme-toggle {
+            background: var(--accent);
+            color: #121212;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 15px;
+            border-radius: 50px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            color: #121212;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+
+        .btn-logout {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .container {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .error-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+
+        .error-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .error-item {
+            color: #856404;
+            padding: 3px 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: #121212;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .column {
+            background: var(--column-bg);
+            border-radius: 24px;
+            padding: 20px;
+            min-height: 70vh;
+            border: 1px solid var(--border);
+        }
+
+        .column-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .btn-detalii {
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: rgba(184, 163, 137, 0.15);
+            color: var(--accent);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 70px);
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            z-index: 998;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 1100px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav">
+    <div class="nav-left">
+        <button class="hamburger" id="hamburgerBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="logo">INTERVENTION360</div>
+    </div>
+    <div class="nav-right">
+        <form th:action="@{/search-intervention}" method="post" class="search-bar">
+            <input type="text" name="interventionId" placeholder="Search by ID..." required>
+            <button type="submit">GO</button>
+        </form>
+        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">DARK</button>
+        <div class="user-profile">
+            <div class="avatar" th:text="${userName != null ? #strings.substring(userName, 0, 1) : 'U'}">U</div>
+            <span style="font-size: 0.85rem; font-weight: 700;" th:text="${userName}">User</span>
+        </div>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="sidebar-menu" id="sidebarMenu">
+    <div class="menu-section">
+        <div class="menu-title">Navigation</div>
+        <a href="/dashboard" class="menu-item active">Dashboard</a>
+        <a href="/clienti" class="menu-item">Clients</a>
+        <a href="/statistici" class="menu-item">Statistics</a>
+    </div>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="container">
+    <div th:if="${errors != null && !errors.isEmpty()}" class="error-box">
+        <ul class="error-list">
+            <li class="error-item" th:each="err : ${errors}" th:text="${err}"></li>
+        </ul>
+    </div>
+
+    <div class="header-actions">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800;">Workflow</h1>
+            <p style="color: var(--text-muted);"
+               th:text="'Hello, ' + ${userName} + '! You have ' + (${programate.size()} + ${inDesfasurare.size()}) + ' active interventions.'">
+                Welcome Message
+            </p>
+        </div>
+        <a href="/adauga_interventie" class="btn-add">+ Schedule</a>
+    </div>
+
+    <div class="kanban-board">
+        <div class="column">
+            <div class="column-header">Scheduled <span class="badge" th:text="${programate.size()}">0</span></div>
+            <div th:each="int : ${programate}">
+                <div class="task-card">
+                    <small style="color: var(--accent); font-weight: 800;" th:text="${#temporals.format(int.data, 'dd-MM-yyyy')}">Date</small>
+                    <h4 style="margin: 8px 0;" th:text="${int.adresa}">Address</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);" th:text="${int.descriere ?: 'No description'}">Description</p>
+                    <a th:href="@{/interventie/{id}(id=${int.id})}" class="btn-detalii">View Details →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">In Progress <span class="badge" th:text="${inDesfasurare.size()}">0</span></div>
+            <div th:each="int : ${inDesfasurare}">
+                <div class="task-card" style="border-left: 4px solid var(--accent);">
+                    <h4 style="margin: 8px 0;" th:text="${int.adresa}">Address</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);" th:text="${int.descriere}">Description</p>
+                    <a th:href="@{/interventie/{id}(id=${int.id})}" class="btn-detalii">Manage →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">Completed <span class="badge" th:text="${finalizate.size()}" style="opacity: 0.6;">0</span></div>
+            <div th:each="int : ${finalizate}">
+                <div class="task-card" style="opacity: 0.7;">
+                    <h4 style="margin-bottom: 5px;" th:text="${int.adresa}">Address</h4>
+                    <a th:href="@{/interventie/{id}(id=${int.id})}" class="btn-detalii">Archive</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        btn.textContent = isDark ? 'LIGHT' : 'DARK';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeBtn').textContent = 'LIGHT';
+        }
+    };
+
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebarMenu = document.getElementById('sidebarMenu');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        hamburgerBtn.classList.toggle('active');
+        sidebarMenu.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+    }
+
+    hamburgerBtn.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+</script>
+</body>
+</html>

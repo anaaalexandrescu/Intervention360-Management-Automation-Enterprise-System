@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>INTERVENTION360 | Secure Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FDFBF7;
+            --accent: #B8A389;
+            --text: #2D2A26;
+            --white: #FFFFFF;
+            --border: #E8E2D9;
+            --card-shadow: rgba(184, 163, 137, 0.1);
+            --popout-bg: #2D2A26;
+        }
+
+        body.dark-mode {
+            --bg: #121212;
+            --accent: #D4C3B0;
+            --text: #E0E0E0;
+            --white: #1E1E1E;
+            --border: #333333;
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --popout-bg: #333333;
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .pin-popout {
+            position: fixed;
+            top: 20px;
+            background: var(--popout-bg);
+            color: #FFFFFF;
+            padding: 15px 25px;
+            border-radius: 50px;
+            z-index: 100;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px var(--card-shadow);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .logo {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+
+        .error-box {
+            background: #FFEBEE;
+            color: #D32F2F;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #FFCDD2;
+            text-align: left;
+        }
+
+        .error-box ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+
+        .error-box li {
+            margin: 3px 0;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .toggle-link {
+            margin-top: 20px;
+            display: block;
+            font-size: 0.85rem;
+            color: #8C8379;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="pin-popout" id="pinDisplay">
+    <span style="font-size: 0.7rem; opacity: 0.7;">CLIENT ACCESS CODE:</span>
+    <span style="letter-spacing: 4px; font-size: 1.4rem; color: var(--accent);" th:text="${displayPin}">0000</span>
+</div>
+
+<div class="card">
+    <div class="logo">INTERVENTION360</div>
+
+    <div th:if="${errors != null and #lists.size(errors) > 0}" class="error-box">
+        <ul>
+            <li th:each="err : ${errors}" th:text="${err}"></li>
+        </ul>
+    </div>
+
+    <div id="loginScreen" class="screen active">
+        <h2 style="margin-top: 0;">Login</h2>
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" name="email" required placeholder="name@company.com or client email">
+            </div>
+            <div class="form-group">
+                <label>Password / PIN</label>
+                <input type="password" name="password" required placeholder="Enter PIN or Employee Password">
+            </div>
+            <button type="submit" class="btn">Sign In</button>
+        </form>
+        <span class="toggle-link" onclick="toggle('registerScreen')">New client? Register here</span>
+    </div>
+
+    <div id="registerScreen" class="screen">
+        <h2>Client Registration</h2>
+        <form th:action="@{/register}" method="post">
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" name="prenume" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" name="nume" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" name="telefon" placeholder="07XXXXXXXX" required>
+            </div>
+            <button type="submit" class="btn">Create Account</button>
+        </form>
+        <span class="toggle-link" onclick="toggle('loginScreen')">Already have an account? Login</span>
+    </div>
+</div>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">DARK</button>
+
+<script>
+    function toggle(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('pinDisplay').style.display = (id === 'loginScreen') ? 'flex' : 'none';
+    }
+
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        btn.textContent = isDark ? 'LIGHT' : 'DARK';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeBtn').textContent = 'LIGHT';
+        }
+    };
+</script>
+</body>
+</html>

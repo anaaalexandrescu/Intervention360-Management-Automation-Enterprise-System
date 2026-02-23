@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Materials - INTERVENTION360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FDFBF7;
+            --accent: #B8A389;
+            --text: #2D2A26;
+            --white: #FFFFFF;
+            --border: #E8E2D9;
+        }
+
+        body.dark-mode {
+            --bg: #121212;
+            --text: #E0E0E0;
+            --white: #1E1E1E;
+            --border: #333333;
+            --accent: #D4C3B0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px 20px;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .material-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 15px;
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        select, input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--text);
+            outline: none;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: #121212;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .btn-save {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .btn-remove {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .btn-back {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a th:href="@{/client/dashboard}" class="btn-back">Back to Dashboard</a>
+    <div class="card">
+        <h2 style="font-weight: 800; margin-bottom: 10px;">Intervention Materials</h2>
+        <p style="margin-bottom: 25px; color: var(--text-muted); font-size: 0.9rem;">Edit resources for intervention.</p>
+
+        <form th:action="@{/client/save-materials}" method="post">
+            <input type="hidden" name="interventieId" th:value="${interventie.id}">
+            <div id="mList">
+                <div th:each="cur : ${materialeCurente}" class="material-item">
+                    <select name="materialIds" required>
+                        <option th:each="m : ${materialeDisponibile}" th:value="${m.id}"
+                                th:text="${m.denumire} + ' (' + ${m.pretAchizitie} + ' RON)'"
+                                th:selected="${m.id == cur['material_id']}"></option>
+                    </select>
+                    <input type="number" name="cantitati" th:value="${cur['cantitate_utilizata']}" min="1" required>
+                    <button type="button" class="btn-remove" onclick="if(confirm('Are you sure you want to remove this material?')) this.parentElement.remove()">Remove</button>
+                </div>
+            </div>
+            <button type="button" class="btn-add" onclick="addM()">Add New Material</button>
+            <button type="submit" class="btn-save">Save All Changes</button>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function toggleTheme() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    const mData = /*[[${materialeDisponibile}]]*/ [];
+
+    function addM() {
+        const div = document.createElement('div');
+        div.className = 'material-item';
+        let options = mData.map(m => `<option value="${m.id}">${m.denumire} (${m.pretAchizitie} RON)</option>`).join('');
+        div.innerHTML = `<select name="materialIds" required>${options}</select><input type="number" name="cantitati" value="1" min="1" required><button type="button" class="btn-remove" onclick="if(confirm('Are you sure you want to remove this material?')) this.parentElement.remove()">Remove</button>`;
+        document.getElementById('mList').appendChild(div);
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+</script>
+</body>
+</html>

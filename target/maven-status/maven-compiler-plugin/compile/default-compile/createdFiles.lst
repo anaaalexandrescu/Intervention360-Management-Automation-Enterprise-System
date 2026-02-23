@@ -1,0 +1,5 @@
+com\interventii\management_interventii\ManagementInterventiiApplication.class
+com\interventii\management_interventii\model\Interventie.class
+com\interventii\management_interventii\service\InterventieService.class
+com\interventii\management_interventii\controller\InterventieController.class
+com\interventii\management_interventii\repository\InterventieRepository.class
