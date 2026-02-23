@@ -3,7 +3,7 @@
 ## 1. Overview
 Intervention360 is a comprehensive enterprise web application built using Java and the Spring Boot framework. It is designed to digitalize, automate, and streamline the workflow of service companies. The system acts as a centralized hub for tracking technical interventions, managing client relationships, monitoring material inventory, generating statistics, and automating the billing process.
 
-## 2. System Architecture
+## 2. System Architecture 
 The application follows a robust Model-View-Controller (MVC) architectural pattern:
 * *Backend Framework*: Spring Boot handles the core configuration, dependency injection, and RESTful/MVC routing.
 * *Data Persistence*: Spring Data JPA and Hibernate map Java objects to relational database tables, abstracting complex SQL queries.
